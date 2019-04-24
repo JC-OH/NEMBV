@@ -8,7 +8,7 @@ import Company from '@/components/page/setting/Company';
 import Group from '@/components/page/setting/Group';
 import Test from '@/components/page/dev/Test';
 import Talk from '@/components/page/board/Talk';
-
+import Qna from '@/components/page/board/Qna';
 Vue.use(Router)
 
 export default new Router({
@@ -81,6 +81,18 @@ export default new Router({
         title: '잡담',
         breadcrumb: [{
           text: '게시판 > 잡담',
+          href: '/',
+        }],
+      },
+    },
+    {
+      path: '/qna',
+      name: 'Qna',
+      component: Qna,
+      meta: {
+        title: 'Q&A',
+        breadcrumb: [{
+          text: '게시판 > Q&A',
           href: '/',
         }],
       },

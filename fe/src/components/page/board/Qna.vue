@@ -73,7 +73,7 @@
                 </b-col>
                 <b-col cols="2">
                   <b-button-group class="float-right" size="sm">
-                    <b-btn variant="outline-warning" @click="mdModCmtOpen(row.item, cmt)"><icon name="edit"></icon></b-btn>
+                    <b-btn variant="outline-warning" @click="mdModCmtOpen(row.item, cmt)"><icon name="pencil"></icon></b-btn>
                     <b-btn variant="outline-danger" @click="delCmt(row.item, cmt, ci)"><icon name="trash"></icon></b-btn>
                   </b-button-group>
                 </b-col>
@@ -93,7 +93,7 @@
           <b-card-footer>
             <small class="text-muted">{{ ago(row.item.ut) }}</small>
             <b-button-group class="float-right">
-              <b-btn variant="outline-warning" @click="mdModOpen(row.item)"><icon name="edit"></icon></b-btn>
+              <b-btn variant="outline-warning" @click="mdModOpen(row.item)"><icon name="pencil"></icon></b-btn>
               <b-btn variant="outline-danger" @click="del(row.item)"><icon name="trash"></icon></b-btn>
             </b-button-group>
           </b-card-footer>
@@ -249,10 +249,10 @@
 
 <script>
   export default {
-    name: 'talk',
+    name: 'qna',
     data() {
       return {
-        path: 'data/board/talk',
+        path: 'data/board/qna',
         fields: [
           {
             key: '_id',
