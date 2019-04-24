@@ -7,6 +7,7 @@ import E404 from '@/components/E404';
 import Company from '@/components/page/setting/Company';
 import Group from '@/components/page/setting/Group';
 import Test from '@/components/page/dev/Test';
+import Talk from '@/components/page/board/Talk';
 
 Vue.use(Router)
 
@@ -71,6 +72,18 @@ export default new Router({
       path: '/hello',
       name: 'Hello',
       component: Hello,
+    },
+    {
+      path: '/talk',
+      name: 'Talk',
+      component: Talk,
+      meta: {
+        title: '잡담',
+        breadcrumb: [{
+          text: '게시판 > 잡담',
+          href: '/',
+        }],
+      },
     },
     {
       path: '*',
