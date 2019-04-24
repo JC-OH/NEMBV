@@ -1,7 +1,10 @@
 <template>
   <div id="app">
     <!-- <img src="./assets/logo.png">-->
-    <router-view></router-view>
+    <b-container fluid class="px-0">
+      <!-- b-container fluid는 고정폭이아닌 유동 폭을 쓰겠다는 것이다. -->
+      <router-view></router-view>
+    </b-container>
   </div>
 </template>
 

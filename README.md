@@ -1,4 +1,5 @@
 # NEMBV
+Node Express Mongo Bootstrap Vue Stack
 
 ## config file definition
 
