@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+// (node:3852) DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
+mongoose.set('useCreateIndex', true);
+
 const companySchema = new mongoose.Schema({
     name: { type: String, index: true }, // 이름
     ut: { type: Date, default: Date.now }, // 변경 날짜 : timestamp

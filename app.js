@@ -99,8 +99,10 @@ const pg = require('./playGround');
 
 mongoose.connect(cfg.db.url, { useNewUrlParser: true } , (err) => {
   if(err) return console.error(err);
+  // (node:3852) DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
+
   console.log('mongoose connected');
-  pg.test.model();
+  // pg.test.model();
 });
 
 module.exports = app;
