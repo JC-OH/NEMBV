@@ -90,12 +90,15 @@ if (!cfg) {
   process.exit(1);
 }
 
+const pg = require('./playGround');
+
 // mongodb에 접속하기 위한 문자열은 아래와 같다.
 // mongodb://id:password@shell연결시들어간샤드주소들/디비이름?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin
 
 mongoose.connect(cfg.db.url, { useNewUrlParser: true } , (err) => {
   if(err) return console.error(err);
   console.log('mongoose connected');
+  pg.test.model();
 });
 
 module.exports = app;
