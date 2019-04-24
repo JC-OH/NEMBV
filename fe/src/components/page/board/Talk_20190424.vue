@@ -5,12 +5,22 @@
         <input type="text" v-model="filter" class="form-control" id="input-text" placeholder="검색 제목">
       </b-col>
       <b-col cols="6">
-        <b-form-group>
+        <b-form-group horizontal label="Per" class="mb-0">
+          <!-- b-form-select: data.perPage와 연동 변경시 데이터 동기화 -->
           <b-form-select :options="pageOptions" v-model="perPage" />
         </b-form-group>
       </b-col>
     </b-row>
-
+    <!--
+    id, ref: 나중에 참조로 이 테이블을 핸들링할때 쓰인다. ref만 있으면된다.
+    show-empty: 데이터가 없을 때 없다고 표시해줌
+    stacked: 모바일등에서 필드가 다 표시가 안될때 아래로 내려준다.
+    items: 데이터 혹은 프로바이더 데이터만 넣으면 일회성이지만 프로바이더(axios등으로 외부 api 정의)를 등록하면 데이터 동기화가 된다.
+    fields: 표시할 컬럼
+    current-page, per-page, sort-by.sync, sort-desc.sync, filter : 위에 선언된 변수로 데이터 동기화가 된다.
+    no-local-sorting: 로컬소팅을 안 쓰겠다는 것이다.
+    busy.sync: 데이터 동기화중에 재동기화 방지
+    -->
     <b-table
       id="tt"
       ref="table"
@@ -28,9 +38,9 @@
     >
       <!--@sort-changed="sortingChanged"-->
       <!--:no-local-sorting="true"-->
+      <!-- template.slot: 표현될 데이터가 단순 text가 아닐 경우 해당 슬롯(cell) 내용을 원하는데로 변경할 수 있다. -->
       <template slot="_id" slot-scope="row">
         <b-badge variant="info">
-          <!--{{ row.item._id }}-->
           {{ id2time(row.item._id) }}
         </b-badge>
       </template>
@@ -49,8 +59,12 @@
         <b-button size="sm" variant="primary" @click.stop="row.toggleDetails" @click="read(row)">
           {{ row.detailsShowing ? '숨기기' : '보기' }}
         </b-button>
-        <!--<b-btn>{{row.item._id}}</b-btn>-->
       </template>
+      <!--
+      items: 실제 데이터가 들어있다. eg) row.items._id
+      row.toggleDetail: 해당 로를 클릭했을 때 아래로 자세한 내용 화면을 토글할 수 있다.
+      row-detail: 간단한 카드 등록
+      -->
       <template slot="row-details" slot-scope="row">
         <b-card no-body
                 :title="row.item.title"
@@ -58,38 +72,6 @@
           <b-card-body>
             <p class="card-text" style="white-space: pre;">{{row.item.content}}</p>
           </b-card-body>
-
-          <b-list-group flush>
-            <b-list-group-item v-for="(cmt) in row.item.cmt_ids" :key="cmt._id">
-              <b-row>
-                <b-col cols="2">
-                  <b-badge>{{ cmt.id }}</b-badge>
-                </b-col>
-                <b-col cols="6">
-                  <span style="white-space: pre;">  {{ cmt.content}}</span>
-                </b-col>
-                <b-col cols="2">
-                  <small class="text-muted"> {{ cmt.ip }} | {{ ago(cmt.ut) }}</small>
-                </b-col>
-                <b-col cols="2">
-                  <b-button-group class="float-right" size="sm">
-                    <b-btn variant="outline-warning" @click="mdModCmtOpen(cmt)"><icon name="edit"></icon></b-btn>
-                    <b-btn variant="outline-danger" @click="delCmt(cmt)"><icon name="trash"></icon></b-btn>
-                  </b-button-group>
-                </b-col>
-              </b-row>
-
-
-            </b-list-group-item>
-            <b-list-group-item>
-              <span> 새 댓글 작성 </span>
-              <b-button-group class="float-right" size="sm">
-                <b-btn variant="outline-success" @click="mdAddCmtOpen(row.item)"><icon name="plus"></icon></b-btn>
-              </b-button-group>
-            </b-list-group-item>
-
-          </b-list-group>
-
           <b-card-footer>
             <small class="text-muted">{{ ago(row.item.ut) }}</small>
             <b-button-group class="float-right">
@@ -109,6 +91,9 @@
         <b-btn variant="success" @click="mdAddOpen" >글쓰기</b-btn>
       </b-col>
       <b-col>
+        <!--
+        b-pagination: b-table과 변수를 같이 쓰기 때문에 데이터 동기화 또한 같이 된다.
+        -->
         <b-pagination
           align="right"
           size="md"
@@ -123,8 +108,8 @@
     <b-modal ref="mdAdd" hide-footer title="새로운 글 작성">
       <b-form @submit="add">
         <b-form-group label="이름:"
-                      label-for="f-a-id">
-          <b-form-input id="f-a-id"
+                      label-for="fid">
+          <b-form-input id="fid"
                         type="text"
                         v-model="form.id"
                         required
@@ -133,8 +118,8 @@
         </b-form-group>
 
         <b-form-group label="제목:"
-                      label-for="f-a-title">
-          <b-form-input id="f-a-title"
+                      label-for="ftitle">
+          <b-form-input id="ftitle"
                         type="text"
                         v-model="form.title"
                         required
@@ -143,8 +128,8 @@
         </b-form-group>
 
         <b-form-group label="글"
-                      label-for="f-a-content">
-          <b-form-textarea id="f-a-content"
+                      label-for="fcontent">
+          <b-form-textarea id="fcontent"
                            v-model="form.content"
                            placeholder="재미있는 글"
                            :rows="10"
@@ -159,8 +144,8 @@
     <b-modal ref="mdMod" hide-footer title="글 수정하기">
       <b-form @submit="mod">
         <b-form-group label="이름:"
-                      label-for="f-m-id">
-          <b-form-input id="f-m-id"
+                      label-for="fid">
+          <b-form-input id="fid"
                         type="text"
                         v-model="form.id"
                         required
@@ -169,8 +154,8 @@
         </b-form-group>
 
         <b-form-group label="제목:"
-                      label-for="f-m-title">
-          <b-form-input id="f-m-title"
+                      label-for="ftitle">
+          <b-form-input id="ftitle"
                         type="text"
                         v-model="form.title"
                         required
@@ -179,8 +164,8 @@
         </b-form-group>
 
         <b-form-group label="글"
-                      label-for="f-m-content">
-          <b-form-textarea id="f-m-content"
+                      label-for="fcontent">
+          <b-form-textarea id="fcontent"
                            v-model="form.content"
                            placeholder="재미있는 글"
                            :rows="10"
@@ -190,69 +175,24 @@
 
         <b-btn type="submit" variant="warning" class="float-right">글 수정</b-btn>
       </b-form>
+
+
+      <!--<div slot="modal-footer">-->
+      <!--<b-btn type="submit" class="float-right" variant="primary">저장</b-btn>-->
+      <!--</div>-->
     </b-modal>
-
-    <b-modal ref="mdAddCmt" hide-footer title="댓글 작성">
-      <b-form @submit="addCmt">
-        <b-form-group label="이름:"
-                      label-for="f-a-c-id">
-          <b-form-input id="f-a-c-cid"
-                        type="text"
-                        v-model="formCmt.id"
-                        required
-                        placeholder="홍길동">
-          </b-form-input>
-        </b-form-group>
-
-        <b-form-group label="글"
-                      label-for="f-a-c-content">
-          <b-form-textarea id="f-a-c-content"
-                           v-model="formCmt.content"
-                           placeholder="재미있는 글"
-                           :rows="10"
-                           :max-rows="20">
-          </b-form-textarea>
-        </b-form-group>
-
-        <b-btn type="submit" variant="primary" class="float-right">글 쓰기</b-btn>
-      </b-form>
-    </b-modal>
-
-    <b-modal ref="mdModCmt" hide-footer title="댓글 수정하기">
-      <b-form @submit="modCmt">
-        <b-form-group label="이름:"
-                      label-for="f-m-c-id">
-          <b-form-input id="f-m-c-id"
-                        type="text"
-                        v-model="formCmt.id"
-                        required
-                        placeholder="홍길동">
-          </b-form-input>
-        </b-form-group>
-
-        <b-form-group label="글"
-                      label-for="f-m-c-ontent">
-          <b-form-textarea id="f-m-c-ontent"
-                           v-model="formCmt.content"
-                           placeholder="재미있는 글"
-                           :rows="10"
-                           :max-rows="20">
-          </b-form-textarea>
-        </b-form-group>
-
-        <b-btn type="submit" variant="warning" class="float-right">글 수정</b-btn>
-      </b-form>
-    </b-modal>
-
   </div>
 </template>
 
 <script>
 
   export default {
-    name: 'talk',
+    name: 'Talk',
     data() {
       return {
+        // 원래 쓰던 변수가 있으나 가급적 https://bootstrap-vue.js.org/docs/components/table 대로 네이밍했다.
+        // fields: 화면에 표시할 헤더부분이다(th), sortTable이 true면 소트버튼이 나오며 자동 연동 소트가 된다.
+        // 이때 소트는 html요소의 소트 방법에 따라 local로 할것인지 프로바이더를 통할것인지 정할 수 있다.
         fields: [
           {
             key: '_id',
@@ -290,26 +230,31 @@
             sortable: true,
           },
         ],
+        // isBusy: 데이터를 불러오는 도중 또다른 요청을 막기 위함이다.
+        // true중일때는 테이블이 회색이 된다. 그러므로 완료 후 꼭 false가 되야한다
         isBusy: false,
+        // items: 실제 데이터, axios와 묶여 있는 데이터가 바뀌는 즉시 테이블도 변경된다.
         items: [],
+        // currentPage: 현재 페이지
         currentPage: 1,
+        // perPage: 한번에 볼 수 있는 로우 양
         perPage: 5,
+        // totalRows: 모든 데이터 양
         totalRows: 0,
+        // pageOptions: perPage할 양 정의
         pageOptions: [5, 10, 15],
+        // sortBy: 소트할 필드명
         sortBy: 'ut',
+        // sortDesc: 소트 내림차, 오름차 방향
         sortDesc: false,
+        // filter: 검색어
         filter: '',
         draw: 0,
+        // form: 글 작성시 데이터
         form: {
           _id: '',
           id: '',
           title: '',
-          content: '',
-        },
-        formCmt: {
-          bd_id: '',
-          _id: '',
-          id: '',
           content: '',
         },
       };
@@ -367,26 +312,13 @@
         this.form.content = v.content;
         this.$refs.mdMod.show();
       },
-      mdAddCmtOpen(v) {
-        this.formCmt.bd_id = v._id;
-        this.formCmt._id = '';
-        this.formCmt.id = '';
-        this.formCmt.content = '';
-        this.$refs.mdAddCmt.show();
-      },
-      mdModCmtOpen(v) {
-        this.formCmt.bd_id = v._id;
-        this.formCmt._id = v._id;
-        this.formCmt.id = v.id;
-        this.formCmt.content = v.content;
-        this.$refs.mdModCmt.show();
-      },
       ago(t) {
         return this.$moment(t).fromNow();
       },
       id2time(_id) {
         return new Date(parseInt(_id.substring(0, 8), 16) * 1000).toLocaleString();
       },
+      // refresh: 해당 테이블 동기화한다.
       refresh() {
         this.$refs.table.refresh();
       },
@@ -398,6 +330,7 @@
         this.list();
         // console.log(ctx);
       },
+      // list(ctx): table 프로바이더로 등록되어 있을 경우 ctx에 현재 행위에 대한 값이 내려온다. 수신부 프라미스를 리턴하면 된다.
       list(ctx) {
         this.sortBy = ctx.sortBy;
         this.sortDesc = ctx.sortDesc;
@@ -425,6 +358,7 @@
             return [];
           });
       },
+      // read: 해당로우 전체를 가져오고 데이터를 치환한다.
       read(r) {
         if (r.detailsShowing) return;
         const _id = r.item._id;
@@ -434,7 +368,6 @@
             if (!res.data.success) throw new Error(res.data.msg);
             r.item.cntView = res.data.d.cntView;
             r.item.content = res.data.d.content;
-            r.item.cmt_ids = res.data.d.cmt_ids;
             // console.log(res.data.d);
             // console.log(r.item);
             this.isBusy = false;
@@ -444,6 +377,7 @@
             this.swalError(err.message);
           });
       },
+      // add: 데이터 추가
       add(evt) {
         evt.preventDefault();
         this.$axios.post(`${this.$cfg.path.api}data/board`, this.form)
@@ -459,6 +393,7 @@
             this.swalError(err.message);
           });
       },
+      // mod: 데이터 수정
       mod() {
         this.$swal({
           title: '작성한 글을 수정하시겠습니까?',
@@ -491,6 +426,7 @@
             this.swalWarning('글 수정 취소');
           });
       },
+      // del: 데이터 삭제
       del(v) {
         this.$swal({
           title: '글 삭제',
@@ -521,84 +457,6 @@
           .catch((err) => {
             if (err.message) return this.swalError(err.message);
             this.swalWarning('글 삭제 취소');
-          });
-      },
-      addCmt(evt) {
-        evt.preventDefault();
-        this.$axios.post(`${this.$cfg.path.api}data/comment`, this.formCmt)
-          .then((res) => {
-            if (!res.data.success) throw new Error(res.data.msg);
-            return this.swalSuccess('댓글 추가 완료');
-          })
-          .then(() => {
-            this.$refs.mdAddCmt.hide();
-            this.refresh();
-          })
-          .catch((err) => {
-            this.swalError(err.message);
-          });
-      },
-      modCmt() {
-        this.$swal({
-          title: '댓글 수정 변경',
-          dangerMode: true,
-          buttons: {
-            cancel: {
-              text: '취소',
-              visible: true,
-            },
-            confirm: {
-              text: '수정',
-            },
-          },
-        })
-          .then((res) => {
-            if (!res) throw new Error('');
-            return this.$axios.put(`${this.$cfg.path.api}data/comment`, this.formCmt);
-          })
-          .then((res) => {
-            if (!res.data.success) throw new Error(res.data.msg);
-            return this.swalSuccess('댓글 수정 완료');
-          })
-          .then(() => {
-            this.$refs.mdModCmt.hide();
-            this.refresh();
-          })
-          .catch((err) => {
-            if (err.message) this.swalError(err.message);
-            else this.swalWarning('댓글 수정 취소');
-          });
-      },
-      delCmt(cmt) {
-        this.$swal({
-          title: '댓글 삭제',
-          dangerMode: true,
-          buttons: {
-            cancel: {
-              text: '취소',
-              visible: true,
-            },
-            confirm: {
-              text: '삭제',
-            },
-          },
-        })
-          .then((res) => {
-            if (!res) throw new Error('');
-            return this.$axios.delete(`${this.$cfg.path.api}data/comment`, {
-              params: { _id: cmt._id },
-            });
-          })
-          .then((res) => {
-            if (!res.data.success) throw new Error(res.data.msg);
-            return this.swalSuccess('댓글 삭제 완료');
-          })
-          .then(() => {
-            this.refresh();
-          })
-          .catch((err) => {
-            if (err.message) return this.swalError(err.message);
-            this.swalWarning('댓글 삭제 취소');
           });
       },
     },
