@@ -47,7 +47,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'fe', 'dist'))); // added here
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 // route의 [index, users]라는 파일을 각 [/,/users] 로 라우팅을 한것이다.
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
@@ -74,6 +73,29 @@ app.use(function(err, req, res, next) {
   // 그외 페이지 없음은 기존에는 error.pug를 렌더링 했지만 api 요청이기 때문에만 써야할 내용만 남겼다.
   //res.render('error');
   res.send({ success: false, msg: err.message , router: "root"});
+});
+
+const mongoose = require('mongoose');
+// [config file]
+// 디비 연결스트링은 비밀번호가 들어 있기 때문에 코드에 밖기에는 어색하고 다른 디비로 변경시에도 불편하다.
+// cfg.json 보다 module이 나은 이유는 위처럼 주석 처리도 가능하고 따옴표등도 통일성 있게 가능하며 computed된 작은 함수들도 넣을 수 있기 때문
+
+// 그래서 git에 관리되어지지 않는 cfg/cfg.js 를 만들어서 로드해보도록 하겠다.
+// 우선 깃에서 무시되도록 cfg/ 등록
+// # cfg files
+// cfg/
+const cfg = require('./cfg/cfg');
+if (!cfg) {
+  console.error('./cfg/cfg.js file not exists');
+  process.exit(1);
+}
+
+// mongodb에 접속하기 위한 문자열은 아래와 같다.
+// mongodb://id:password@shell연결시들어간샤드주소들/디비이름?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin
+
+mongoose.connect(cfg.db.url, { useNewUrlParser: true } , (err) => {
+  if(err) return console.error(err);
+  console.log('mongoose connected');
 });
 
 module.exports = app;
