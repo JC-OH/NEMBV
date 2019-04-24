@@ -91,7 +91,9 @@ if (!cfg) {
 }
 
 const pg = require('./playGround');
-
+// [mongoose]
+// mongoose는 ODM(Object Document Mapping)이다.
+// 문서(Document)를 자바스크립트 객체(Object)로 바꿔준다고 생각하면 될 것 같다.
 // mongodb에 접속하기 위한 문자열은 아래와 같다.
 // mongodb://id:password@shell연결시들어간샤드주소들/디비이름?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin
 
