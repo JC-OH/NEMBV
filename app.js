@@ -30,6 +30,11 @@ app.use(cookieParser());
 // [정적인 파일]
 // 이 항목은 public 디렉토리를 정적인 파일들을 담을 수 있는 그릇으로 만들어준다.
 // public에 index.html을 만들어 버렸기 때문에(응답해버림) 2번 항목으로 내려가지 못한것이다.
+
+// 백엔드에 있는 app.js에서 /fe/dist를 스태틱 라우트 포인트로 추가해본다.
+// 이제 최우선 순위로 /fe/dist/index.html을 먼저 라우트 할 것이다
+// vue-router가 경로를 http://localhost:3000/#/ 로 바꾸고 vue 시작페이지가 나온 것을 확인 할 수 있다.
+app.use(express.static(path.join(__dirname, 'fe', 'dist'))); // added here
 app.use(express.static(path.join(__dirname, 'public')));
 
 // route의 [index, users]라는 파일을 각 [/,/users] 로 라우팅을 한것이다.
