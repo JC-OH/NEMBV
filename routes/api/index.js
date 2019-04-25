@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const test = require('./test');
 const data = require('./data');
+const auth = require('./auth');
 
 // localhost:3000/api 로 들어 올 경우 모든 요청에 서버 콘솔로 welcome to api를 적는다
 router.all('*', (req, res, next) => {
@@ -16,6 +17,8 @@ router.all('*', (req, res, next) => {
 // 그 중 localhost:3000/api/test 는 하위 api/test 에서 처리한다
 router.use('/test', test);
 router.use('/data', data);
+// auth 라우터 추가
+router.use('/auth', auth);
 
 // localhost:3000/api/abcd 등 test가 아닌 경우 성공 실패와 이유가 담긴 json을 리턴한다.
 router.all('*', (req, res) => {

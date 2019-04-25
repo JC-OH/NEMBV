@@ -70,6 +70,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
 
+// api route 위에 키셋을 해준다.
+app.set('jwt-secret', cfg.web.secret_key);  // add
+
 // 다른 라우트 포인트는 다 비우고 api만 남겼다.
 // routes/api를 use 선언한다고하면 하부 디렉토리에서 index.js를 찾아서 실행하게된다.
 app.use('/api', require('./routes/api'));

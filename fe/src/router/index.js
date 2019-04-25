@@ -9,6 +9,9 @@ import Group from '@/components/page/setting/Group';
 import Test from '@/components/page/dev/Test';
 import Talk from '@/components/page/board/Talk';
 import Qna from '@/components/page/board/Qna';
+import Register from '@/components/page/Register';
+import Sign from '@/components/page/Sign';
+
 Vue.use(Router)
 
 export default new Router({
@@ -97,6 +100,32 @@ export default new Router({
         }],
       },
     },
+    {
+      path: '/register',
+      name: 'Register',
+      component: Register,
+      meta: {
+        title: 'Register',
+        breadcrumb: [{
+          text: 'User > Register',
+          href: '/',
+        }],
+      },
+    },
+    {
+      path: '/sign',
+      name: 'Sign',
+      component: Sign,
+      meta: {
+        title: 'Register',
+        breadcrumb: [{
+          text: 'User > Sign',
+          href: '/',
+        }],
+      },
+    },
+
+
     {
       path: '*',
       name: 'E404',
