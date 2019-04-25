@@ -17,3 +17,20 @@ Node Express Mongo Bootstrap Vue Stack
       },
     };
     ```
+    
+    ```
+    module.exports = {
+        db: {
+            url: ''
+        },
+        web: {
+            // 추후 http, https, port등
+            // 개발용과 배포용이 필요하기 때문에 설정값으로 만들어 둔다.
+            cors: true, //개발용,
+            // 발급자로 사용될 host를 넣어준다.
+            host: '',
+            // 패스워드를 평문으로 저장하지 않고 시크릿키로 만든 해쉬값으로 저장하기 위함
+            secret_key: '',
+        }
+    };
+    ```
