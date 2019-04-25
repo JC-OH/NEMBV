@@ -2,6 +2,11 @@ const router = require('express').Router();
 const test = require('./test');
 const data = require('./data');
 const auth = require('./auth');
+const check = require('./check');
+
+// 기존 작성해두었던 middleware 부분을 따로 check.js에 따로 정리했다.
+// verify는 헤더의 토큰 검사용이며, 다른 미들웨어를 추가 할 수도 있다.
+router.all('*', check.verify);
 
 // localhost:3000/api 로 들어 올 경우 모든 요청에 서버 콘솔로 welcome to api를 적는다
 router.all('*', (req, res, next) => {

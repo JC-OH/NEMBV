@@ -10,6 +10,8 @@ import swal from 'sweetalert';
 import Icon from 'vue-awesome/components/Icon';
 // vue2-google-maps: 구글맵 사용
 import * as VueGoogleMaps from 'vue2-google-maps';
+import VueCookie from 'vue-cookie';
+
 
 import App from './App'
 import router from './router'
@@ -32,6 +34,28 @@ moment.locale('ko');
 
 // process.env.NODE_ENV 가 ‘production’ 면 npm run build ‘development’ 면 npm run dev
 if (process.env.NODE_ENV === 'development') cfg.path.api = 'http://localhost:3000/api/';
+
+// [axios의 모든 응답은 이곳을 거친다.]
+const token = VueCookie.get('token');
+// cookie를 가져와서 있다면 공용헤더 인증에 넣어준다.
+if (token) axios.defaults.headers.common.Authorization = VueCookie.get('token');
+
+axios.interceptors.response.use((res) => {
+  // sign.vue에서 요청을 할 경우 응답에 토큰이 있으니, cookie에 저장하고 공용헤더 인증에 넣어준다.
+  if (res.data.token) {
+    // 쿠키 만료시간도 역시 2분으로 주었다. 1년으로 준다 하더라도 api에서 리젝당하니 별 의미는 없다.
+    VueCookie.set('token', res.data.token, { expires: '2m' });
+    axios.defaults.headers.common.Authorization = VueCookie.get('token');
+  }
+  return Promise.resolve(res);
+}, (err) => {
+  // 다른 페이지 요청시 응답에러에 401이 있을 경우 로그인 페이지로 이동 시킨다.
+  if (err.response.status === 401) {
+    location.href = '/#/sign';
+    return;
+  }
+  return Promise.reject(err);
+});
 
 // [전역으로 쓰기 위한 prototype 구성]
 // axios는 이제 모든 페이지서 사용될 것이기 때문에 전역 선언을 한다.
